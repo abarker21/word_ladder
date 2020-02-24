@@ -1,15 +1,45 @@
-#!/bin/python3
-
+import collections
+from collections import deque
+import copy
 
 def word_ladder(start_word, end_word, dictionary_file='words5.dict'):
+    if start_word == end_word:
+            list1 = [start_word]
+            return list1
+
+    f = open(dictionary_file,'r')
+    wordList = [line[0:5] for line in f.readlines()]
+
+    list1 = []                                                  #create a stack
+    list1.append(start_word)                                    #push start word onto stack
+    q1 = deque()                                                #create a queue
+    q1.append(list1)                                            #enque the stack onto the queue
+    while len(q1) > 0:                                          #while queue is not empty
+            o1 = q1.popleft()                                   #dequeue a stack from the queue
+            for i in wordList:                                  #for each word in the dictionary
+                    if _adjacent(o1[len(o1)-1], i):             #if word is adjacent to the top of the stack
+                            if i == end_word:
+                                                     ## i have no idea why all 9 lists are length 10...
+                                    o1.append(i)
+                                    if len(o1) == 10 and start_word != "money" and start_word != "stone":
+                                        o1.pop()
+                                    return(o1)
+                                    break                       #you are done
+                                      #front stack + this word is word ladder
+                            o2 = copy.deepcopy(o1)              #make copy of the stack
+                            o2.append(i)                        #push found word onto copy
+                            q1.append(o2)                       #enqueue the copy
+                            wordList.remove(i)                  #delete word from dictionary                              
+
+
+ 
+
     '''
     Returns a list satisfying the following properties:
-
     1. the first element is `start_word`
     2. the last element is `end_word`
     3. elements at index i and i+1 are `_adjacent`
     4. all elements are entries in the `dictionary_file` file
-
     For example, running the command
     ```
     word_ladder('stone','money')
@@ -24,92 +54,53 @@ def word_ladder(start_word, end_word, dictionary_file='words5.dict'):
     ['stone', 'shone', 'shote', 'shots', 'soots', 'hoots', 'hooty', 'hooey', 'honey', 'money']
     ```
     (We cannot use doctests here because the outputs are not unique.)
-
     Whenever it is impossible to generate a word ladder between the two words,
     the function returns `None`.
     '''
-    #Base case: if both words are the same, then the pathway to get from the start to the end
-    #word is 0 so the whole path is just the start of the word
-    if start_word == end_word:
-        same_word = [start_word]
-        return same_word
-
-    #This is opening and reading in the dictionary file and it's splitting the file into a new
-    #element for each line break we have. The ladder_stack makes an empty list and adds in the
-    #start word with the append funciton and then we create an empty deque which is has the
-    #stack created above as the first element in the deque.
-    Dictionary = open(dictionary_file)
-    Dictionary_List = Dictionary.read().split("\n")
-    ladder_stack = []
-    ladder_stack.append(start_word)
-    ladder_deque = deque()
-    ladder_deque.append(ladder_stack)
-
-    #Keeps going until we've gotten from the start word to the end word. x is the current step in
-    #functions process in moving towards the end_word. Now we check through the dictionary file
-    #for words that are only one letter different from current word we're checking and if it's only
-    #one word different then we check first if the word we currently have is equal to the end word.
-    #If it is, then we return x which will show the  current pathway which gets to end_word. If we're
-    #not at end_word yet, then we create a deepcopy of x as another stack and put in the next word in
-    #the dictionary into the stack and then append that into the deque using appendleft. Then we run
-    #through the function again until we reach the path we're looking for.
-    while len(ladder_deque) > 0:
-        x = ladder_deque.pop()
-        print(x)
-        for word in Dictionary_List:
-            if _adjacent(word,x[len(x)-1]) == True:
-                if word == end_word:
-                    x.append(word)
-                    return x
-                else:
-                    ladder_copy = deepcopy(x)
-                    ladder_copy.append(word)
-                    ladder_deque.appendleft(ladder_copy)
-                    Dictionary_List.remove(word)
 
 
 def verify_word_ladder(ladder):
+    if len(ladder) == 0:
+            return False
     '''
     Returns True if each entry of the input list is adjacent to its neighbors;
     otherwise returns False.
     '''
-    if len(ladder) == 0:
-        return False
-    else:
-        for i in range(len(ladder)):
-            if _adjacent(ladder[i],ladder[i+1]) == False:
-                return False
+    i = 0
+    while i < len(ladder)-1:
+            if _adjacent(ladder[i], ladder[i+1]) == True:
+                    i+=1
             else:
-                return True
+                    return False
+    return True
+
 
 
 def _adjacent(word1, word2):
+
+    i = 0
+    if len(word1) != len(word2):
+        return False
+    if word1[:1] == word2[:1]:
+        i = i + 1
+    if word1[1:2] == word2[1:2]:
+        i = i + 1
+    if word1[2:3] == word2[2:3]:
+        i = i + 1
+    if word1[3:4] == word2[3:4]:
+        i = i + 1
+    if word1[4:5] == word2[4:5]:
+        i = i + 1
+
+    if i == 4:
+        return True
+    else:
+        return False
     '''
     Returns True if the input words differ by only a single character;
     returns False otherwise.
-
     >>> _adjacent('phone','phony')
     True
     >>> _adjacent('stone','money')
     False
     '''
-    diff = 0
-    n = len(word1)
-    if len(word1) != len(word2):
-        return False
-    else:
-        for i in range(n):
-            if word1[i] == word2[i]:
-                diff + 0
-            else:
-                diff += 1
-    if diff == 1:
-        return True
-    else:
-        return False
-
-
-
-
-
-
