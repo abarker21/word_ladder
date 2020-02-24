@@ -32,6 +32,7 @@ def word_ladder(start_word, end_word, dictionary_file='words5.dict'):
                             wordList.remove(i)                  #delete word from dictionary                              
 
 
+ 
 
     '''
     Returns a list satisfying the following properties:
